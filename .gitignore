@@ -7,7 +7,7 @@
 !.github
 php_errorlog
 .log
-
+!src/js/component
 # track this file .gitignore (i.e. do NOT ignore it)
 !composer.json
 !webpack.config.js
