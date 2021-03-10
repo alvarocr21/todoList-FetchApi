@@ -1,24 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 //create your first component
 export function ToDoList() {
 	const [tarea, setTarea] = useState("");
-	let [tareas, setTareas] = useState([]);
+	const [tareas, setTareas] = useState([]);
 
-	let requestOptions = {
-		method: "GET",
-		redirect: "follow"
+	useEffect(() => {
+		// Actualiza el título del documento usando la API del navegador
+		loadTodo();
+	});
+
+	let url = "https://assets.breatheco.de/apis/fake/todos/user/asolano";
+
+	const loadTodo = () => {
+		fetch(url, {
+			method: "Get",
+			headers: { "Content-Type": "application/json" }
+		})
+			.then(res => res.json())
+			.then(data => {
+				setTareas(data);
+				console.log({ data });
+			})
+			.catch(error => console.error("Error:", error.message));
 	};
 
-	fetch(
-		"https://assets.breatheco.de/apis/fake/todos/user/asolano",
-		requestOptions
-	)
-		.then(response => {
-			console.log(response);
-		})
-		.catch(error => console.log("error", error));
+	//loadTodo();
 
+	const newUser = () => {
+		let array = [];
+		fetch(url, {
+			method: "Post",
+			body: JSON.stringify(array),
+			headers: { "Content-Type": "application/json" }
+		})
+			.then(res => res.json())
+			.then(data => {
+				loadTodo();
+			});
+	};
+
+	const updatetodo = tareas => {
+		fetch(url, {
+			method: "Put",
+			body: JSON.stringify(tareas),
+			headers: { "Content-Type": "application/json" }
+		})
+			.then(res => res.json())
+			.then(data => {
+				loadTodo();
+				alert(data.result);
+			});
+	};
 	const validateTask = () => {
 		if (tarea === "")
 			alert("Debe ingresar algún valor para agregar la tarea");
@@ -26,22 +59,15 @@ export function ToDoList() {
 			setTareas([
 				...tareas,
 				{
-					id: tareas.length,
-					value: tarea
+					done: false,
+					label: tarea
 				}
 			]);
 			alert("Tarea agregada Satisfactoriamente");
+			console.log(tareas);
 			setTarea("");
 		}
 	};
-
-	//const removerTarea = index => {
-	//alert(index);
-	//let newList = tareas;
-	//newList.splice(index, 1);
-	//console.log(newList);
-	//setTareas([...newList]);
-	//};
 
 	return (
 		<div className=" container text-center mt-5 d-flex justify-content-center">
@@ -62,15 +88,21 @@ export function ToDoList() {
 							className="btn btn-outline-success"
 							type="button"
 							id="button-addon2"
-							onClick={validateTask}>
+							onClick="">
 							Agregar
 						</button>
 					</div>
 				</div>
 				<div className="card-body text-left">
 					{tareas.map((muestratarea, index) => (
-						<li key={muestratarea.id} className="list-group-item ">
-							{muestratarea.value}
+						<li key={index} className="list-group-item ">
+							{muestratarea.label}
+							<input
+								type="button"
+								className="btn btn-danger btn-sm float-right"
+								//onClick={() => removerTarea(index)}
+								value="Concluir"
+							/>
 						</li>
 					))}
 				</div>
