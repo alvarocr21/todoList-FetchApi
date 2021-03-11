@@ -8,12 +8,13 @@ export function ToDoList() {
 	useEffect(() => {
 		// Actualiza el título del documento usando la API del navegador
 		loadTodo();
-	});
+		contarTodo();
+	}, ["loadTodo"]);
 
 	let url = "https://assets.breatheco.de/apis/fake/todos/user/asolano";
 
-	const loadTodo = () => {
-		fetch(url, {
+	const loadTodo = async () => {
+		await fetch(url, {
 			method: "Get",
 			headers: { "Content-Type": "application/json" }
 		})
@@ -52,65 +53,147 @@ export function ToDoList() {
 				alert(data.result);
 			});
 	};
+
+	const deletetodo = tareas => {
+		fetch(url, {
+			method: "delete",
+			body: "",
+			headers: { "Content-Type": "application/json" }
+		})
+			.then(res => res.json())
+			.then(data => {
+				alert(data.result);
+			})
+			.catch(error => console.log("error", error));
+	};
+
 	const validateTask = () => {
 		if (tarea === "")
 			alert("Debe ingresar algún valor para agregar la tarea");
 		else {
-			setTareas([
-				...tareas,
-				{
-					done: false,
-					label: tarea
-				}
-			]);
-			alert("Tarea agregada Satisfactoriamente");
+			let nuevo = {
+				label: tarea,
+				done: false
+			};
+			tareas.push(nuevo);
+			//alert("Tarea agregada Satisfactoriamente");
 			console.log(tareas);
+			updatetodo(tareas);
+			loadTodo();
 			setTarea("");
 		}
 	};
 
+	const todoTask = index => {
+		//alert(index);
+		let newList = tareas;
+
+		let item = newList[index];
+		item.done = true;
+		console.log(newList);
+		//setTareas([...newList]);
+		updatetodo(newList);
+	};
+
+	const doneTask = index => {
+		//alert(index);
+		let newList = tareas;
+
+		let item = newList[index];
+		item.done = false;
+		console.log(newList);
+		//setTareas([...newList]);
+		updatetodo(newList);
+	};
+
+	let contarTodo = () => {
+		let contar = 0;
+		for (let i = 0; i < tareas; i++) {
+			if (tareas[i].done == false) {
+				contar++;
+			}
+		}
+		return contar;
+	};
+
 	return (
 		<div className=" container text-center mt-5 d-flex justify-content-center">
-			<div className="card col-6">
-				<h5 className="card-title">To Do List</h5>
-				<div className="input-group mb-3 col-12">
-					<input
-						type="text"
-						className="form-control"
-						placeholder="Ingrese la tarea"
-						aria-label="Recipient's username"
-						aria-describedby="button-addon2"
-						onChange={e => setTarea(e.target.value)}
-						value={tarea}
-					/>
-					<div className="input-group-append">
-						<button
-							className="btn btn-outline-success"
-							type="button"
-							id="button-addon2"
-							onClick="">
-							Agregar
-						</button>
-					</div>
-				</div>
-				<div className="card-body text-left">
-					{tareas.map((muestratarea, index) => (
-						<li key={index} className="list-group-item ">
-							{muestratarea.label}
-							<input
+			<div className="col-6">
+				<div className="card col-12">
+					<h5 className="card-title mt-4">To Do List</h5>
+					<div className="input-group mb-3 col-12">
+						<input
+							type="text"
+							className="form-control"
+							placeholder="Ingrese la tarea"
+							aria-label="Recipient's username"
+							aria-describedby="button-addon2"
+							onChange={e => setTarea(e.target.value)}
+							value={tarea}
+						/>
+						<div className="input-group-append">
+							<button
+								className="btn btn-outline-success"
 								type="button"
-								className="btn btn-danger btn-sm float-right"
-								//onClick={() => removerTarea(index)}
-								value="Concluir"
-							/>
-						</li>
-					))}
+								id="button-addon2"
+								onClick={validateTask}>
+								Agregar
+							</button>
+						</div>
+					</div>
+					<div className="card-body text-left">
+						{tareas.map((muestratarea, index) => {
+							if (muestratarea.done == false) {
+								return (
+									<li
+										key={index}
+										className="list-group-item ">
+										{muestratarea.label}
+										<input
+											type="button"
+											className="btn btn-danger btn-sm float-right"
+											onClick={() => todoTask(index)}
+											value="Concluir"
+										/>
+									</li>
+								);
+							}
+						})}
+					</div>
+					<p className="card-text text-left ml-2">
+						<small className="text-muted">
+							{tareas.length} task ready
+						</small>
+					</p>
 				</div>
-				<p className="card-text text-left ml-2">
-					<small className="text-muted">
-						{tareas.length} task left
-					</small>
-				</p>
+				<div className="card col-12 mt-2">
+					<h5 className="card-title mt-4">Done List</h5>
+					<div className="input-group mb-3 col-12"></div>
+					<div className="card-body text-left">
+						{tareas.map((muestratarea, index) => {
+							if (muestratarea.done == true) {
+								return (
+									<li
+										key={index}
+										className="list-group-item ">
+										{muestratarea.label}
+										<input
+											type="button"
+											className="btn btn-primary btn-sm float-right"
+											onClick={() => doneTask(index)}
+											value="Activar"
+										/>
+									</li>
+								);
+							}
+						})}
+					</div>
+					<p className="card-text text-left ml-2">
+						<small className="text-muted">
+							{tareas.length} task ready
+						</small>
+					</p>
+				</div>
 			</div>
 		</div>
 	);
