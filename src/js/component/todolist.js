@@ -4,16 +4,19 @@ import React, { useState, useEffect } from "react";
 export function ToDoList() {
 	const [tarea, setTarea] = useState("");
 	const [tareas, setTareas] = useState([]);
+	const [falso, setFalso] = useState(0);
+	const [verdadero, setVerdadero] = useState(0);
 
 	useEffect(() => {
 		// Actualiza el título del documento usando la API del navegador
 		loadTodo();
-		contarTodo();
+		//contarTodo();
 	}, ["loadTodo"]);
 
 	let url = "https://assets.breatheco.de/apis/fake/todos/user/asolano";
 
 	const loadTodo = async () => {
+		let contar = 0;
 		await fetch(url, {
 			method: "Get",
 			headers: { "Content-Type": "application/json" }
@@ -22,6 +25,14 @@ export function ToDoList() {
 			.then(data => {
 				setTareas(data);
 				console.log({ data });
+
+				for (let i = 0; i < data.length; i++) {
+					if (data[i].done == false) {
+						contar++;
+					}
+				}
+				setFalso(contar);
+				setVerdadero(data.length - contar);
 			})
 			.catch(error => console.error("Error:", error.message));
 	};
@@ -106,14 +117,15 @@ export function ToDoList() {
 		updatetodo(newList);
 	};
 
-	let contarTodo = () => {
+	let contarTodo = async () => {
 		let contar = 0;
-		for (let i = 0; i < tareas; i++) {
+		for (let i = 0; i < tareas.length; i++) {
 			if (tareas[i].done == false) {
 				contar++;
 			}
 		}
-		return contar;
+		//console.log({ data });
+		console.log(contar);
 	};
 
 	return (
@@ -161,9 +173,7 @@ export function ToDoList() {
 						})}
 					</div>
 					<p className="card-text text-left ml-2">
-						<small className="text-muted">
-							{tareas.length} task ready
-						</small>
+						<small className="text-muted">{falso} task ready</small>
 					</p>
 				</div>
 				<div className="card col-12 mt-2">
@@ -190,7 +200,7 @@ export function ToDoList() {
 					</div>
 					<p className="card-text text-left ml-2">
 						<small className="text-muted">
-							{tareas.length} task ready
+							{verdadero} task ready
 						</small>
 					</p>
 				</div>
