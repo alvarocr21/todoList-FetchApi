@@ -116,18 +116,6 @@ export function ToDoList() {
 		//setTareas([...newList]);
 		updatetodo(newList);
 	};
-
-	let contarTodo = async () => {
-		let contar = 0;
-		for (let i = 0; i < tareas.length; i++) {
-			if (tareas[i].done == false) {
-				contar++;
-			}
-		}
-		//console.log({ data });
-		console.log(contar);
-	};
-
 	return (
 		<div className=" container text-center mt-5 d-flex justify-content-center">
 			<div className="col-6">
